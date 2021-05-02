@@ -9,7 +9,10 @@ Django chat is a simple chat application built using django channels. It allows 
 - Messages saved to db, so the messages do not disappear after you close the channel
 
 ## To run project
--  install the required dependecies      ``` pip install -r requirements.txt```
+-  install the required dependecies
+    - ```channels==2.4.0```
+    - ```channels-redis==2.4.2```
+    - ```Django==3.1.7```
 -  install reddis on your local computer for the channel layers and start the reddis server
 -  run ```python manage.py migrate ``` to setup the database
 -  run ``` python manage.py runserver ``` to start the development and test out the application
