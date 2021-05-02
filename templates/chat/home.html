@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home Page
+{% endblock title %}
+
+{% block body %}
+<div class="container pt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <h1 class="display-5">Available Users</h1>
+
+            <ul class="list-group">
+                {% for user in users %}
+                    <li class="list-group-item">
+                        <a href="{% url 'chat-user' user.id %}"> {{user.username}} </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="col-md-8">
+            <h1 class="display-5">Practicing Django Channels</h1>
+            <div class="mb-3">
+                <input type="text" class="form-control mb-1" id="chatGroupName" placeholder="Enter the name of the group">
+
+                <input type="submit" class="btn btn-primary" id="submitBtn" value="enter">
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock body %}
+
+
+{% block personalScripts %}
+<script>
+    var chatGroupName = document.getElementById("chatGroupName");
+    var submitBtn = document.getElementById("submitBtn");
+
+    submitBtn.addEventListener('click',(e)=>{
+        if (chatGroupName.value){
+            window.location.pathname = `chat/room/${chatGroupName.value}`;
+        }
+    })
+</script>
+{% endblock personalScripts %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}
+chat room
+{% endblock title %}
+
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center pt-3">
+
+        <div class="col-md-6">
+
+            <div id="chat">
+            </div>
+
+            <div class="row">
+                <div class="col-9">
+                    <input type="text" class="form-control" placeholder="Enter message" id="message-input">
+                </div>
+                <div class="col-3">
+                    <button class="btn btn-primary" id="submit-btn">send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
+
+
+{% block personalScripts %}
+<script>
+    var scoketUrl = `ws://${window.location.host}/ws/chat/room/{{ room_name }}/`;
+    var submitBtn = document.getElementById('submit-btn');
+    var messageInput = document.getElementById('message-input');
+    var chatDisplay = document.getElementById('chat');
+    var webSocket = new WebSocket(scoketUrl);
+    
+    webSocket.onmessage = function(e){
+        var dataReceived = JSON.parse(e["data"]);
+        var newParagraph = document.createElement('p')
+        newParagraph.innerText = dataReceived["message"];
+        newParagraph.classList.add("lead")
+
+        chatDisplay.append(newParagraph)
+    }
+
+    webSocket.onclose = function(e){
+        console.error("socket closed unexpectedly")
+    }
+
+    webSocket.onready = function(e){
+        console.log("record the previous message")
+    }
+
+    submitBtn.addEventListener('click', (e)=>{
+        var message = messageInput.value
+        message = message.trim()
+
+        if (message){
+            webSocket.send(JSON.stringify({'message': message, 'command': 'new_message',}))
+            messageInput.value = ""
+        }
+    })
+</script>
+{% endblock personalScripts %}

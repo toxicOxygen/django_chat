@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{target_user.username}}
+{% endblock title %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center pt-3">
+
+        <div class="col-md-6">
+
+            <div id="chat">
+            </div>
+
+            <div class="row">
+                <div class="col-9">
+                    <input type="text" class="form-control" placeholder="Enter message" id="message-input">
+                </div>
+                <div class="col-3">
+                    <button class="btn btn-primary" id="submit-btn">send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
+
+
+
+{% block personalScripts %}
+<script>
+    var socketUrl = `ws://${window.location.host}/ws/chat/user/{{ target_user.id }}/`;
+    var chatDisplay = document.getElementById("chat");
+    var submitBtn = document.getElementById("submit-btn");
+    var messageInput = document.getElementById("message-input");
+    
+    var socket = new WebSocket(socketUrl);
+    socket.onmessage = function(e){
+        var data = JSON.parse(e["data"]);
+        
+        if(data.hasOwnProperty('type')){
+            var messages = JSON.parse(data.data);
+            for (var msg of messages){
+                createNewMessage(msg)
+            }
+        }else{
+            createNewMessage(data)
+        }
+    }
+
+    socket.onclose = function(e){
+        console.error("socket connection was closed unexpectedly")
+    }
+
+    socket.onopen = function(e){
+        socket.send(JSON.stringify({'command':'fetch_message'}))
+    }
+
+    submitBtn.addEventListener('click', (e)=>{
+        let message = messageInput.value;
+        message = message.trim()
+
+        if (message){
+            socket.send(JSON.stringify({'message': message, 'command':'new_message',}))
+            messageInput.value = ""
+        }
+    })
+
+    function createNewMessage(data){
+        var newParagraph = document.createElement('p')
+        newParagraph.innerText = data["message"];
+        newParagraph.classList.add("lead")
+
+        chatDisplay.append(newParagraph)
+    }
+
+</script>
+{% endblock personalScripts %}
